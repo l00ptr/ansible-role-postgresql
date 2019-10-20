@@ -1,0 +1,4 @@
+standby_mode = 'on'
+primary_conninfo = 'host={{ postgresql_master }} port=5432 user={{ postgresql_replication_user|default('replication') }} password={{ postgresql_replication_password }}'
+trigger_file = '{{ postgresql_trigger_promote_slave | default('/tmp/trigger') }}'
+restore_command = 'cp {{ postgresql_slave_wal_dir | regex_replace('\\/$', '')}}/%f "%p"'
