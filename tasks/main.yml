@@ -29,3 +29,5 @@
 - import_tasks: databases.yml
 - import_tasks: replication.yml
   when: postgresql_slave_host is defined
+- import_tasks: replication_slave.yml
+  when: postgresql_slave_host is defined

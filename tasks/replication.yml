@@ -17,6 +17,10 @@
     line: include 'replication_master.conf'
     path: "{{ postgresql_config_path }}/postgresql.conf"
 
+- name: restart postgres on master  
+  service:
+    name: "{{ postgresql_daemon }}"
+    state: restarted 
 
 # Create and share key between master and slave
 # master will use a private key to rsync data to the slave
@@ -72,63 +76,8 @@
   become_user: "{{ postgresql_user }}"
   when: known_hosts is changed
 
-- name: Create required directories on slave
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ postgresql_slave_user }}"
-    group: "{{ postgresql_slave_user }}"
-  delegate_to: "{{ postgresql_slave_host }}"
-  with_items:
-    - "{{ postgresql_slave_wal_dir }}"
-    - "{{ getent_passwd[postgresql_slave_user][4] }}/.ssh"
-
 - name: Fetch public key from master node
   fetch:
     src: "{{ getent_passwd[postgresql_user][4] }}/.ssh/id_rsa.pub"
     dest: "/tmp/public_key_{{ inventory_hostname }}"
     flat: true
-
-- name: Transfer public key to slave
-  lineinfile:
-    dest: "{{ getent_passwd[postgresql_slave_user][4] }}/.ssh/authorized_keys"
-    line: "{{ lookup('file', '/tmp/public_key_'+inventory_hostname)}}"
-    owner: "{{ postgresql_slave_user }}"
-    group: "{{ postgresql_slave_user }}"
-    create: yes
-  delegate_to: "{{ postgresql_slave_host }}"
-
-- name: restart postgres on master  
-  service:
-    name: "{{ postgresql_daemon }}"
-    state: restarted 
-
-- name: Stop postgres on slave
-  service:
-    name: "{{ postgresql_daemon }}"
-    state: stopped
-  delegate_to: "{{ postgresql_slave_host }}"
-
-- name: Delete pgdata dir on slave (for sync)
-  file:
-    path: "{{ postgresql_pgdata }}"
-    state: absent
-  delegate_to: "{{ postgresql_slave_host }}"
-
-
-- name: get data from master
-  environment:
-    PGPASSWORD: "{{ postgresql_replication_password }}"
-  shell: "pg_basebackup -h {{ postgresql_master }} -D {{ postgresql_pgdata }} -P -U replication  -X s"
-  become: true
-  become_user: "{{ postgresql_slave_user }}"
-  delegate_to: "{{ postgresql_slave_host }}"
-
-- name: Configure slave server
-  template:
-    src: recovery.conf.j2
-    dest: "{{ postgresql_pgdata }}/recovery.conf"
-    backup: true
-    owner: "{{ postgresql_slave_user }}"
-    group: "{{ postgresql_slave_user }}"
-  delegate_to: "{{ postgresql_slave_host }}"
