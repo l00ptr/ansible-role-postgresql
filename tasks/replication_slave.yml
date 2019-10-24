@@ -60,7 +60,6 @@
     backup: true
     owner: "{{ postgresql_slave_user }}"
     group: "{{ postgresql_slave_user }}"
-  when: not postgresql_version == 12
   delegate_to: "{{ postgresql_slave_host }}"
 
 - name: Start postgres on slave
