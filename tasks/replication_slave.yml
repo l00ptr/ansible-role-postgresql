@@ -49,7 +49,7 @@
 
 - name: redfine recovery path for postgres 12
   set_fact:
-    postgresql_recovery_path: "{{ postgresql_config_path }}"
+    postgresql_recovery_path: "{{ postgresql_config_path }}/conf.d/"
   when: postgresql_version == 12
   delegate_to: "{{ postgresql_slave_host }}"
 
@@ -62,16 +62,6 @@
     group: "{{ postgresql_slave_user }}"
   when: not postgresql_version == 12
   delegate_to: "{{ postgresql_slave_host }}"
-
-- name: Add include for recovery into main config file
-  lineinfile:
-    insertafter: EOF
-    state: present
-    line: include 'recovery.conf'
-    path: "{{ postgresql_config_path }}/postgresql.conf"
-  when: postgresql_version == 12
-  delegate_to: "{{ postgresql_slave_host }}"
-
 
 - name: Start postgres on slave
   service:
