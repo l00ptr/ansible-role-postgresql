@@ -67,11 +67,11 @@
   lineinfile:
     dest: "{{ getent_passwd[postgresql_user][4] }}/.ssh/known_hosts"
     line: "{{ postgresql_slave_host }}"
-  check_mode: yes
+  check_mode: true
   register: known_hosts
 
 - name: Ensure master knows about slave SSH key
-  shell: "ssh-keyscan -trsa -p22 {{ postgresql_slave_host }} >> {{ getent_passwd[postgresql_user][4] }}/.ssh/known_hosts"
+  shell: "ssh-keyscan -trsa -p22 {{ postgresql_slave_host }}>>{{ getent_passwd[postgresql_user][4] }}/.ssh/known_hosts"
   become: true
   become_user: "{{ postgresql_user }}"
   when: known_hosts is changed
