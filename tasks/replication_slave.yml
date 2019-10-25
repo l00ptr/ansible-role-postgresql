@@ -36,11 +36,22 @@
 - name: Get data from master
   environment:
     PGPASSWORD: "{{ postgresql_replication_password }}"
-  shell: "pg_basebackup -h {{ postgresql_master }} -D {{ postgresql_pgdata }} -P -U replication  -X s"
+    shell: "pg_basebackup -h {{ postgresql_master }} -D {{ postgresql_pgdata }} -P -U replication  -X s"
   become: true
   become_user: "{{ postgresql_slave_user }}"
   delegate_to: "{{ postgresql_slave_host }}"
   tags: [never, postgresql_slave_sync]
+
+- name: Create standby.signal if it doesn't exist (required by postgres 12)
+  file:
+    path: "{{ getent_passwd[postgresql_user][4] }}/standby.signal"
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+    owner: "{{ postgresql_slave_user }}"
+    group: "{{ postgresql_slave_user }}"
+  when: postgresql_version == 12
+  delegate_to: "{{ postgresql_slave_host }}"
 
 - name: define recovery path
   set_fact:
