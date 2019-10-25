@@ -17,10 +17,10 @@
     line: include 'replication_master.conf'
     path: "{{ postgresql_config_path }}/postgresql.conf"
 
-- name: restart postgres on master  
+- name: restart postgres on master
   service:
     name: "{{ postgresql_daemon }}"
-    state: restarted 
+    state: restarted
 
 # Create and share key between master and slave
 # master will use a private key to rsync data to the slave
@@ -44,7 +44,7 @@
 
 - name: Generate SSH key
   shell: "ssh-keygen -b 2048 -t rsa -f {{ getent_passwd[postgresql_user][4] }}/.ssh/id_rsa -q -N ''"
-  when: stat_sshkey_res.stat.exists == False 
+  when: not stat_sshkey_res.stat.exists
 
 - name: Change permission on .ssh directory
   file:
@@ -70,7 +70,7 @@
   check_mode: yes
   register: known_hosts
 
-- name: Ensure master knows about slave SSH key 
+- name: Ensure master knows about slave SSH key
   shell: "ssh-keyscan -trsa -p22 {{ postgresql_slave_host }} >> {{ getent_passwd[postgresql_user][4] }}/.ssh/known_hosts"
   become: true
   become_user: "{{ postgresql_user }}"

@@ -13,7 +13,7 @@
 - name: Transfer public key to slave
   lineinfile:
     dest: "{{ getent_passwd[postgresql_slave_user][4] }}/.ssh/authorized_keys"
-    line: "{{ lookup('file', '/tmp/public_key_'+inventory_hostname)}}"
+    line: "{{ lookup('file', '/tmp/public_key_'+inventory_hostname) }}"
     owner: "{{ postgresql_slave_user }}"
     group: "{{ postgresql_slave_user }}"
     create: true
