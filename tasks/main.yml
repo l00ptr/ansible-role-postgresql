@@ -27,19 +27,19 @@
 
 # Configure PostgreSQL.
 - include_tasks: users.yml
-  when: 
+  when:
     - not postgresql_is_slave
 - include_tasks: users_databases.yml
-  when: 
+  when:
     - not postgresql_is_slave
 - include_tasks: databases.yml
-  when: 
+  when:
     - not postgresql_is_slave
 - include_tasks: replication.yml
-  when: 
+  when:
     - postgresql_slave_host is defined
     - not postgresql_is_slave
 - include_tasks: replication_slave.yml
-  when: 
+  when:
     - postgresql_slave_host is defined
     - not postgresql_is_slave
