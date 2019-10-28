@@ -68,7 +68,7 @@
   lineinfile:
     dest: "{{ getent_passwd[postgresql_user][4] }}/.ssh/known_hosts"
     line: "{{ postgresql_slave_host }}"
-  check_mode: yes
+  check_mode: true
   register: known_hosts
 
 - name: Ensure master knows about slave SSH key
