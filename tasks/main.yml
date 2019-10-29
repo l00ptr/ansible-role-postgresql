@@ -29,12 +29,15 @@
 - include_tasks: users.yml
   when:
     - not postgresql_is_slave
+  tags: create_users
 - include_tasks: users_databases.yml
   when:
     - not postgresql_is_slave
+  tags: create_databases
 - include_tasks: databases.yml
   when:
     - not postgresql_is_slave
+  tags: create_databases
 - include_tasks: replication.yml
   when:
     - postgresql_slave_host is defined
