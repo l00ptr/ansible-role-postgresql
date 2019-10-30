@@ -1,0 +1,14 @@
+---
+- name: Ensure PostgreSQL users are present.
+  postgresql_privs:
+    roles: "{{ item.roles | default('PUBLIC') }}"
+    priv: "{{ item.priv | default(omit) }}"
+    objs: "{{ item.objs |default(omit) }}"
+    type: "{{ item.type|default('database') }}"
+    db: "{{ item.db | default(omit) }}"
+  with_items: "{{ postgresql_privs }}"
+  become: true
+  become_user: "{{ postgresql_user }}"
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
