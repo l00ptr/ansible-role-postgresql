@@ -27,22 +27,22 @@
     enabled: "{{ postgresql_service_enabled }}"
 
 # Create users, databases and privileges
-- include_tasks: users.yml
+- include: users.yml
   when:
     - not postgresql_is_slave
   tags: create_users
-- include_tasks: users_databases.yml
+- include: users_databases.yml
   when:
     - not postgresql_is_slave
   tags: create_databases
-- include_tasks: databases.yml
+- include: databases.yml
   when:
     - not postgresql_is_slave
   tags: create_databases
-- include_tasks: privileges.yml
+- include: privileges.yml
   when:
     - not postgresql_is_slave
-  tags: [create_privileges]
+  tags: create_privileges
 
 
 # Configure replication
