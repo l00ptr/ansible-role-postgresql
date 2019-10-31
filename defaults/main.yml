@@ -81,4 +81,5 @@ postgresql_users: []
 #   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
 #   port: # defaults to not set
 #   state: # defaults to 'present'
+postgresql_privs: []
 postgresql_is_slave: false
